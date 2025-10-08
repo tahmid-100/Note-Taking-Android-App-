@@ -1,3 +1,6 @@
+// HomeScreen.kt
+// Main screen displaying the list of notes, search bar, theme selection, and favorite filter.
+
 package com.example.noteapp.ui.screens
 
 import androidx.compose.foundation.clickable
@@ -23,27 +26,28 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: NoteViewModel,
-    themePreferences: ThemePreferences, // ← Add this
-    onAddClick: () -> Unit,
-    onNoteClick: (Int) -> Unit
+    viewModel: NoteViewModel, // ViewModel for note operations
+    themePreferences: ThemePreferences, // Theme preferences for dark/light/system mode
+    onAddClick: () -> Unit, // Callback for add note button
+    onNoteClick: (Int) -> Unit // Callback for note item click
 ) {
-    val notes by viewModel.filteredNotes.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val showFavoritesOnly by viewModel.showFavoritesOnly.collectAsState()
+    val notes by viewModel.filteredNotes.collectAsState() // List of notes filtered by search/favorite
+    val searchQuery by viewModel.searchQuery.collectAsState() // Current search query
+    val showFavoritesOnly by viewModel.showFavoritesOnly.collectAsState() // Show only favorite notes
 
-    // Theme preferences
+    // Theme preferences state
     val useSystemTheme by themePreferences.useSystemTheme.collectAsState(initial = true)
     val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = false)
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope() // Coroutine scope for theme changes
 
-    // Show theme menu
+    // Controls visibility of theme selection menu
     var showThemeMenu by remember { mutableStateOf(false) }
 
+    // Scaffold provides the main layout structure
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Notes") },
+                title = { Text("My Notes") }, // App bar title
                 actions = {
                     // Theme toggle button
                     IconButton(onClick = { showThemeMenu = true }) {
@@ -55,7 +59,7 @@ fun HomeScreen(
                         )
                     }
 
-                    // Theme menu dropdown
+                    // Dropdown menu for theme selection
                     DropdownMenu(
                         expanded = showThemeMenu,
                         onDismissRequest = { showThemeMenu = false }
@@ -103,7 +107,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = if (showFavoritesOnly) Icons.Default.Favorite
                             else Icons.Default.FavoriteBorder,
-                            contentDescription = "Filter Favorites",
+                            contentDescription = "Filter Favorites", // Toggles favorite filter
                             tint = if (showFavoritesOnly) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.onSurface
                         )
@@ -117,18 +121,20 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAddClick,
+                onClick = onAddClick, // Add note button
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Note")
             }
         }
     ) { paddingValues ->
+        // Main content column
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Search bar for filtering notes
             SearchBar(
                 query = searchQuery,
                 onQueryChange = { viewModel.onSearchQueryChange(it) },
@@ -137,6 +143,7 @@ fun HomeScreen(
                     .padding(16.dp)
             )
 
+            // Show empty state if no notes, else show notes list
             if (notes.isEmpty()) {
                 EmptyState(showFavoritesOnly = showFavoritesOnly)
             } else {
@@ -151,9 +158,9 @@ fun HomeScreen(
                     ) { note ->
                         NoteItem(
                             note = note,
-                            onNoteClick = { onNoteClick(note.id) },
-                            onDeleteClick = { viewModel.deleteNote(note) },
-                            onFavoriteClick = { viewModel.toggleFavorite(note.id) }
+                            onNoteClick = { onNoteClick(note.id) }, // Navigate to note details
+                            onDeleteClick = { viewModel.deleteNote(note) }, // Delete note
+                            onFavoriteClick = { viewModel.toggleFavorite(note.id) } // Toggle favorite
                         )
                     }
                 }
@@ -162,6 +169,10 @@ fun HomeScreen(
     }
 }
 
+/**
+ * SearchBar composable for filtering notes by query.
+ * Displays a clear button when query is not empty.
+ */
 @Composable
 fun SearchBar(
     query: String,
@@ -192,6 +203,10 @@ fun SearchBar(
     )
 }
 
+/**
+ * NoteItem composable displays a single note card with title, description, timestamp,
+ * favorite toggle, and delete button. Shows a confirmation dialog before deleting.
+ */
 @Composable
 fun NoteItem(
     note: Note,
@@ -272,13 +287,14 @@ fun NoteItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = formatTimestamp(note.timestamp),
+                text = formatTimestamp(note.timestamp), // Formatted note timestamp
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
         }
     }
 
+    // Confirmation dialog for deleting a note
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -303,6 +319,10 @@ fun NoteItem(
     }
 }
 
+/**
+ * EmptyState composable displays a message and icon when there are no notes to show.
+ * Shows different content based on whether the favorite filter is active.
+ */
 @Composable
 fun EmptyState(showFavoritesOnly: Boolean) {
     Box(
@@ -338,6 +358,9 @@ fun EmptyState(showFavoritesOnly: Boolean) {
     }
 }
 
+/**
+ * Formats a timestamp (Long) to a readable date string.
+ */
 private fun formatTimestamp(timestamp: Long): String {
     val sdf = SimpleDateFormat("MMM dd, yyyy • hh:mm a", Locale.getDefault())
     return sdf.format(Date(timestamp))

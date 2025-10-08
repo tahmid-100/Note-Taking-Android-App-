@@ -12,9 +12,9 @@ import com.example.noteapp.ui.screens.HomeScreen
 import com.example.noteapp.ui.viewmodel.NoteViewModel
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object AddNote : Screen("add_note")
-    object EditNote : Screen("edit_note/{noteId}") {
+    object Home : Screen("home") // Route for the home screen
+    object AddNote : Screen("add_note") // Route for adding a new note
+    object EditNote : Screen("edit_note/{noteId}") { // Route for editing a note with noteId as argument
         fun createRoute(noteId: Int) = "edit_note/$noteId"
     }
 }
@@ -23,11 +23,11 @@ sealed class Screen(val route: String) {
 fun NavGraph(
     navController: NavHostController,
     viewModel: NoteViewModel,
-    themePreferences: ThemePreferences // ← Add this parameter
+    themePreferences: ThemePreferences
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Home.route // Initial screen
     ) {
         composable(route = Screen.Home.route) {
             HomeScreen(

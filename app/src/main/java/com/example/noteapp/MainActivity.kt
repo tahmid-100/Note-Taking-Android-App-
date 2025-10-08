@@ -20,37 +20,47 @@ import com.example.noteapp.ui.theme.NoteAppTheme
 import com.example.noteapp.ui.viewmodel.NoteViewModel
 import com.example.noteapp.ui.viewmodel.NoteViewModelFactory
 
+/**
+ * MainActivity is the entry point of the app.
+ * Sets up the database, repository, ViewModel, and theme preferences.
+ * Observes theme settings and applies the correct theme.
+ * Hosts the navigation graph for the app's screens.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge() // Enables edge-to-edge layout for immersive UI
 
+        // Initialize database, repository, ViewModel factory, and theme preferences
         val database = NoteDatabase.getDatabase(applicationContext)
         val repository = NoteRepository(database.noteDao())
         val viewModelFactory = NoteViewModelFactory(repository)
         val themePreferences = ThemePreferences(applicationContext)
 
         setContent {
-            // Observe theme preferences
+            // Observe theme preferences from DataStore
             val useSystemTheme by themePreferences.useSystemTheme.collectAsState(initial = true)
             val savedDarkMode by themePreferences.isDarkMode.collectAsState(initial = false)
-            val systemDarkMode = isSystemInDarkTheme()
+            val systemDarkMode = isSystemInDarkTheme() // Detect system dark mode
 
-            // Determine which theme to use
+            // Choose theme: system or user preference
             val darkTheme = if (useSystemTheme) systemDarkMode else savedDarkMode
 
+            // Apply app theme
             NoteAppTheme(darkTheme = darkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // Set up navigation controller and ViewModel
                     val navController = rememberNavController()
                     val viewModel: NoteViewModel = viewModel(factory = viewModelFactory)
 
+                    // Host the navigation graph, passing theme preferences
                     NavGraph(
                         navController = navController,
                         viewModel = viewModel,
-                        themePreferences = themePreferences // ← Pass to NavGraph
+                        themePreferences = themePreferences // Pass to NavGraph for theme switching
                     )
                 }
             }

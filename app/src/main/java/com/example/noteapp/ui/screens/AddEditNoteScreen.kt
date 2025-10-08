@@ -1,5 +1,7 @@
-package com.example.noteapp.ui.screens
+// AddEditNoteScreen.kt
+// Screen for adding or editing a note. Handles UI and logic for note creation and update.
 
+package com.example.noteapp.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -16,17 +18,22 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditNoteScreen(
-    viewModel: NoteViewModel,
-    noteId: Int?,
-    onNavigateBack: () -> Unit
+    viewModel: NoteViewModel, // ViewModel for note operations
+    noteId: Int?,            // If not null, edit mode; else, add mode
+    onNavigateBack: () -> Unit // Callback for navigation
 ) {
+    // State for note title
     var title by remember { mutableStateOf("") }
+    // State for note description
     var description by remember { mutableStateOf("") }
+    // Holds the existing note if editing
     var existingNote by remember { mutableStateOf<Note?>(null) }
+    // Controls error display for empty title
     var showEmptyTitleError by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope() // Coroutine scope for async operations
 
+    // Load note data if editing
     LaunchedEffect(noteId) {
         if (noteId != null) {
             val note = viewModel.getNoteById(noteId)
@@ -38,6 +45,7 @@ fun AddEditNoteScreen(
         }
     }
 
+    // Save note logic: validates title, updates or inserts note
     val saveNote: () -> Unit = {
         if (title.isBlank()) {
             showEmptyTitleError = true
@@ -59,13 +67,16 @@ fun AddEditNoteScreen(
         }
     }
 
+    // Scaffold provides the basic layout structure
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
+                    // Show appropriate title based on mode
                     Text(if (existingNote != null) "Edit Note" else "Add Note")
                 },
                 navigationIcon = {
+                    // Back button: saves note if title is not blank, else just navigates back
                     IconButton(onClick = {
                         if (title.isNotBlank()) {
                             saveNote()
@@ -77,6 +88,7 @@ fun AddEditNoteScreen(
                     }
                 },
                 actions = {
+                    // Save button: triggers saveNote logic
                     IconButton(onClick = saveNote) {
                         Icon(Icons.Default.Check, contentDescription = "Save")
                     }
@@ -88,17 +100,19 @@ fun AddEditNoteScreen(
             )
         }
     ) { paddingValues ->
+        // Main content column
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Title input field
             OutlinedTextField(
                 value = title,
                 onValueChange = {
                     title = it
-                    showEmptyTitleError = false
+                    showEmptyTitleError = false // Reset error on change
                 },
                 label = { Text("Title") },
                 placeholder = { Text("Enter note title") },
@@ -119,8 +133,9 @@ fun AddEditNoteScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Space between fields
 
+            // Description input field
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -138,6 +153,7 @@ fun AddEditNoteScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Character count display
             Text(
                 text = "${title.length} / ${description.length} characters",
                 style = MaterialTheme.typography.labelSmall,
@@ -146,6 +162,7 @@ fun AddEditNoteScreen(
         }
     }
 
+    // Show error for empty title for 2 seconds
     if (showEmptyTitleError) {
         LaunchedEffect(Unit) {
             kotlinx.coroutines.delay(2000)
