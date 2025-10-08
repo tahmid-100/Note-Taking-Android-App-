@@ -13,18 +13,18 @@ A modern, clean, and fully functional note-taking app for Android built with Jet
 - Theme switching: Light, Dark, and System Default
 
 ## Screenshots
-*Add screenshots here if available*
+
 
 ## Getting Started
 
 ### Prerequisites
 - Android Studio Hedgehog or newer
-- Android device or emulator (API 23+ recommended)
+- Android device or emulator (API 24+ recommended)
 
 ### Build & Run
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/note-taking-android-app.git
+   git clone https://github.com/tahmid-100/note-taking-android-app.git
    ```
 2. Open the project in Android Studio.
 3. Sync Gradle and build the project.
@@ -69,12 +69,9 @@ README.md                   # Project documentation
 ## Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-## License
-This project is licensed under the MIT License.
-
 ## Contact
-For questions or feedback, open an issue or contact [your-email@example.com].
+For questions or feedback, open an issue or contact [tahmidalam8765@gmail.com].
 
 ---
-*Last updated: October 8, 2025*
+
 
