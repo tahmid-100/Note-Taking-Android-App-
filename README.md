@@ -14,6 +14,9 @@ A modern, clean, and fully functional note-taking app for Android built with Jet
 
 ## Screenshots
 
+![App Screenshot](assets/1.jpg)
+![App Screenshot](assets/2.jpg)
+![App Screenshot](assets/3.jpg)
 
 ## Getting Started
 
